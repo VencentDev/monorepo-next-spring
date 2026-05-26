@@ -3,9 +3,9 @@ package com.vencentdev.backend.common.exception;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,11 +17,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-  private final Environment environment;
-
-  public GlobalExceptionHandler(Environment environment) {
-    this.environment = environment;
-  }
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException exception) {
@@ -51,7 +47,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NoResourceFoundException.class)
   ResponseEntity<ApiError> handleNoResourceFound(NoResourceFoundException exception) {
-    return error(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", exception.getMessage(), List.of());
+    return error(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", "Resource not found", List.of());
   }
 
   @ExceptionHandler(BadRequestException.class)
@@ -81,11 +77,12 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   ResponseEntity<ApiError> handleException(Exception exception) {
-    String message =
-        environment.acceptsProfiles(Profiles.of("prod"))
-            ? "Internal server error"
-            : exception.getMessage();
-    return error(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", message, List.of());
+    log.error("Unhandled API exception", exception);
+    return error(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        "INTERNAL_SERVER_ERROR",
+        "Internal server error",
+        List.of());
   }
 
   private ResponseEntity<ApiError> error(

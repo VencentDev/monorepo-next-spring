@@ -9,5 +9,7 @@ RUN ./mvnw clean package -DskipTests -B
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
+RUN groupadd --system app && useradd --system --gid app --home-dir /app app
 COPY --from=build /app/target/*.jar app.jar
+USER app
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

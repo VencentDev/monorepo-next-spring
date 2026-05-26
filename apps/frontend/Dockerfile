@@ -1,20 +1,26 @@
-FROM node:22-alpine AS deps
-WORKDIR /app
+FROM node:20-alpine AS deps
 RUN corepack enable
-COPY package.json ./
-RUN if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
+WORKDIR /repo
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY apps/frontend/package.json apps/frontend/
+COPY packages/api-types/package.json packages/api-types/
+RUN pnpm install --frozen-lockfile
 
-FROM node:22-alpine AS build
-WORKDIR /app
+FROM node:20-alpine AS build
 RUN corepack enable
-COPY --from=deps /app/node_modules ./node_modules
+WORKDIR /repo
+COPY --from=deps /repo/node_modules ./node_modules
 COPY . .
-RUN pnpm build
+RUN pnpm --filter @app/api-types generate:types
+RUN pnpm --filter @app/frontend build
 
-FROM node:22-alpine AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PORT=3000
-COPY --from=build /app ./
+RUN addgroup --system app && adduser --system --ingroup app app
+COPY --from=build /repo/apps/frontend/.next/standalone ./
+COPY --from=build /repo/apps/frontend/.next/static ./apps/frontend/.next/static
+COPY --from=build /repo/apps/frontend/public ./apps/frontend/public
+USER app
 EXPOSE 3000
-CMD ["sh", "-c", "if [ -f server.js ]; then node server.js; else node -e \"require('http').createServer((_,res)=>res.end('frontend scaffold')).listen(process.env.PORT || 3000, '0.0.0.0')\"; fi"]
+CMD ["node", "apps/frontend/server.js"]

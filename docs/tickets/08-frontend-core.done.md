@@ -1,4 +1,4 @@
-# 08 — Frontend Core (`apps/frontend`)
+# 08 — Frontend Core (`apps/frontend`) — Done
 
 **Phase:** 6
 **Depends on:** 01 (monorepo)
@@ -6,7 +6,13 @@
 
 ## Scope
 
-Next.js 14 App Router scaffold, Tailwind + shadcn/ui, dark mode, base layout.
+Next.js App Router scaffold, Tailwind + shadcn/ui-compatible primitives, dark mode,
+base layout.
+
+> Implementation note: the original ticket requested Next.js 14. The security
+> review in `vulnerability-protection.md` found current advisories against the
+> Next.js 14 line, so the implemented scaffold uses patched Next.js 15.5.x
+> instead.
 
 ---
 
@@ -122,9 +128,9 @@ pnpm --filter @app/frontend add next-themes
 ### theme-provider.tsx
 
 ```tsx
-"use client";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import type { ComponentProps } from "react";
+'use client';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import type { ComponentProps } from 'react';
 
 export function ThemeProvider({ children, ...props }: ComponentProps<typeof NextThemesProvider>) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
@@ -134,12 +140,12 @@ export function ThemeProvider({ children, ...props }: ComponentProps<typeof Next
 ### layout.tsx
 
 ```tsx
-import "./globals.css";
-import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/navbar";
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { ThemeProvider } from '@/components/theme-provider';
+import { Navbar } from '@/components/navbar';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
