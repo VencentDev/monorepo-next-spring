@@ -56,7 +56,7 @@ public class Todo extends AuditableEntity {
 }
 ```
 
-### V2__todo.sql
+### V2\_\_todo.sql
 
 ```sql
 CREATE TABLE todos (

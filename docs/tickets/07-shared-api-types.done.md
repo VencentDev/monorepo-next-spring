@@ -65,7 +65,7 @@ Already declared in `turbo.json` (ticket 01). The `generate:types` task outputs 
 ### src/index.ts
 
 ```ts
-export type { paths, components, operations } from "../dist/index";
+export type { paths, components, operations } from '../dist/index';
 ```
 
 (So consumers import from `@app/api-types`, not `@app/api-types/dist`.)
@@ -73,10 +73,10 @@ export type { paths, components, operations } from "../dist/index";
 ### Frontend consumption sample
 
 ```ts
-import type { paths } from "@app/api-types";
+import type { paths } from '@app/api-types';
 
 type TodoResponse =
-  paths["/api/v1/todos/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths['/api/v1/todos/{id}']['get']['responses']['200']['content']['application/json'];
 ```
 
 ### Done when

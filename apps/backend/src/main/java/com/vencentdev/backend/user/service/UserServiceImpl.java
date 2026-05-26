@@ -10,6 +10,7 @@ import com.vencentdev.backend.user.entity.User;
 import com.vencentdev.backend.user.entity.UserType;
 import com.vencentdev.backend.user.mapper.UserMapper;
 import com.vencentdev.backend.user.repository.UserRepository;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,15 @@ public class UserServiceImpl implements UserService {
     User user = findByPrincipal(principal);
     mapper.applyUpdate(request, user);
     return mapper.toResponse(user);
+  }
+
+  @Override
+  @Transactional
+  public UUID resolveInternalId(AuthenticatedUser principal) {
+    return repository
+        .findByExternalId(principal.subject())
+        .orElseGet(() -> repository.save(newUser(principal)))
+        .getId();
   }
 
   private User findByPrincipal(AuthenticatedUser principal) {

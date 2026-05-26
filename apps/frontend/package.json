@@ -8,5 +8,8 @@
     "lint": "echo \"frontend scaffold\"",
     "test": "echo \"frontend scaffold\"",
     "typecheck": "pnpm generate:types"
+  },
+  "dependencies": {
+    "@app/api-types": "workspace:*"
   }
 }
