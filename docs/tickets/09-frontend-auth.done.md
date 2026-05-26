@@ -31,19 +31,19 @@ NEXT_PUBLIC_API_BASE=http://localhost:8080
 ### File: `src/lib/auth.ts`
 
 ```ts
-import NextAuth from "next-auth";
-import Keycloak from "next-auth/providers/keycloak";
+import NextAuth from 'next-auth';
+import Keycloak from 'next-auth/providers/keycloak';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Keycloak({
       clientId: process.env.AUTH_KEYCLOAK_ID!,
-      clientSecret: process.env.AUTH_KEYCLOAK_SECRET ?? "",
+      clientSecret: process.env.AUTH_KEYCLOAK_SECRET ?? '',
       issuer: process.env.AUTH_KEYCLOAK_ISSUER!,
-      authorization: { params: { scope: "openid profile email" } },
+      authorization: { params: { scope: 'openid profile email' } },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: 'jwt' },
   callbacks: {
     async jwt({ token, account }) {
       if (account) {
@@ -66,16 +66,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 async function refreshAccessToken(token: any) {
   try {
     const res = await fetch(`${process.env.AUTH_KEYCLOAK_ISSUER}/protocol/openid-connect/token`, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        grant_type: "refresh_token",
+        grant_type: 'refresh_token',
         client_id: process.env.AUTH_KEYCLOAK_ID!,
-        client_secret: process.env.AUTH_KEYCLOAK_SECRET ?? "",
+        client_secret: process.env.AUTH_KEYCLOAK_SECRET ?? '',
         refresh_token: token.refreshToken as string,
       }),
     });
-    if (!res.ok) throw new Error("refresh_failed");
+    if (!res.ok) throw new Error('refresh_failed');
     const j = await res.json();
     return {
       ...token,
@@ -85,7 +85,7 @@ async function refreshAccessToken(token: any) {
       error: undefined,
     };
   } catch {
-    return { ...token, error: "RefreshAccessTokenError" };
+    return { ...token, error: 'RefreshAccessTokenError' };
   }
 }
 ```
@@ -93,21 +93,21 @@ async function refreshAccessToken(token: any) {
 ### File: `src/app/api/auth/[...nextauth]/route.ts`
 
 ```ts
-import { handlers } from "@/lib/auth";
+import { handlers } from '@/lib/auth';
 export const { GET, POST } = handlers;
 ```
 
 ### Session augmentation: `src/types/next-auth.d.ts`
 
 ```ts
-import "next-auth";
-declare module "next-auth" {
+import 'next-auth';
+declare module 'next-auth' {
   interface Session {
     accessToken?: string;
     error?: string;
   }
 }
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   interface JWT {
     accessToken?: string;
     refreshToken?: string;
@@ -122,8 +122,8 @@ declare module "next-auth/jwt" {
 `src/components/session-provider.tsx`:
 
 ```tsx
-"use client";
-import { SessionProvider } from "next-auth/react";
+'use client';
+import { SessionProvider } from 'next-auth/react';
 export { SessionProvider };
 ```
 
@@ -154,20 +154,20 @@ Covered inline in `lib/auth.ts` above. Refresh fires when current time is within
 ### File: `apps/frontend/middleware.ts`
 
 ```ts
-import { auth } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 
 export default auth((req) => {
   const pathname = req.nextUrl.pathname;
-  const isProtected = pathname.startsWith("/app");
+  const isProtected = pathname.startsWith('/app');
   if (isProtected && !req.auth) {
-    const url = new URL("/api/auth/signin", req.url);
-    url.searchParams.set("callbackUrl", req.url);
+    const url = new URL('/api/auth/signin', req.url);
+    url.searchParams.set('callbackUrl', req.url);
     return Response.redirect(url);
   }
 });
 
 export const config = {
-  matcher: ["/app/:path*"],
+  matcher: ['/app/:path*'],
 };
 ```
 
@@ -177,15 +177,15 @@ export const config = {
 - `/login` — optional custom page; if omitted, Auth.js default `/api/auth/signin` is used. Plan calls for `app/(auth)/login/page.tsx`:
 
 ```tsx
-"use client";
-import { signIn } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+'use client';
+import { signIn } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   return (
     <div className="flex flex-col items-center gap-4 py-20">
       <h1 className="text-2xl font-semibold">Sign in</h1>
-      <Button onClick={() => signIn("keycloak", { callbackUrl: "/app/todos" })}>
+      <Button onClick={() => signIn('keycloak', { callbackUrl: '/app/todos' })}>
         Continue with Keycloak
       </Button>
     </div>
@@ -215,23 +215,23 @@ Auth.js handles `/api/auth/callback/keycloak` automatically. No code needed unle
 
 ```ts
 // src/app/app/todos/actions.ts
-"use server";
-import { auth } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
+'use server';
+import { auth } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 export async function createTodoAction(payload: { title: string; status: string }) {
   const session = await auth();
-  if (!session?.accessToken) throw new Error("unauthorized");
+  if (!session?.accessToken) throw new Error('unauthorized');
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/v1/todos`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${session.accessToken}`,
     },
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error(`api_${res.status}`);
-  revalidatePath("/app/todos");
+  revalidatePath('/app/todos');
   return res.json();
 }
 ```

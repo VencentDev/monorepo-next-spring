@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { Navbar } from '@/components/navbar';
+import { Providers } from '@/components/providers';
 import { ThemeProvider } from '@/components/theme-provider';
 
 import './globals.css';
@@ -19,8 +20,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Navbar />
-          <main className="container mx-auto py-6">{children}</main>
+          <Providers>
+            <Navbar />
+            <main className="container mx-auto py-6">{children}</main>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>
