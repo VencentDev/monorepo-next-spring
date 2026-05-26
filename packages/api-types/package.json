@@ -1,0 +1,11 @@
+{
+  "name": "@repo/api-types",
+  "private": true,
+  "scripts": {
+    "build": "pnpm generate:types",
+    "generate:types": "mkdir -p dist && echo \"{}\" > dist/index.json",
+    "lint": "echo \"api-types scaffold\"",
+    "test": "echo \"api-types scaffold\"",
+    "typecheck": "echo \"api-types scaffold\""
+  }
+}

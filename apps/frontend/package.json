@@ -1,0 +1,12 @@
+{
+  "name": "@app/frontend",
+  "private": true,
+  "scripts": {
+    "build": "pnpm generate:types",
+    "dev": "echo \"frontend scaffold\"",
+    "generate:types": "mkdir -p dist && echo \"{}\" > dist/index.json",
+    "lint": "echo \"frontend scaffold\"",
+    "test": "echo \"frontend scaffold\"",
+    "typecheck": "pnpm generate:types"
+  }
+}

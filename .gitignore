@@ -1,0 +1,12 @@
+node_modules/
+.turbo/
+dist/
+.next/
+target/
+
+.env
+.env.*
+!.env.example
+
+*.log
+.DS_Store

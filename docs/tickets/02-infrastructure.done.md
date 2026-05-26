@@ -31,15 +31,15 @@ services:
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - pgdata:/var/lib/postgresql/data
-    ports: ["5432:5432"]
+    ports: ['5432:5432']
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       retries: 10
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0
-    command: ["start-dev", "--import-realm"]
+    command: ['start-dev', '--import-realm']
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
@@ -49,7 +49,7 @@ services:
       KC_DB_PASSWORD: postgres
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
-    ports: ["8081:8080"]
+    ports: ['8081:8080']
     depends_on:
       postgres:
         condition: service_healthy
@@ -89,6 +89,7 @@ CREATE DATABASE keycloak;
 `docker-compose.yml` at repo root (extends `infra/docker-compose.yml`) OR a separate `docker-compose.full.yml`.
 
 Adds:
+
 - `backend` service built from `apps/backend/Dockerfile`
 - `frontend` service built from `apps/frontend/Dockerfile`
 
@@ -121,7 +122,7 @@ backend:
     SPRING_DATASOURCE_PASSWORD: postgres
     SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/app
     APP_CORS_ALLOWED_ORIGINS: http://localhost:3000
-  ports: ["8080:8080"]
+  ports: ['8080:8080']
   depends_on:
     postgres:
       condition: service_healthy
