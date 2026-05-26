@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useTodoFiltersStore } from '@/store/useTodoFiltersStore';
+import { useTodoFiltersStore } from '@/features/todos/list/hooks/use-todo-filters-store';
 
 type TodoStatusFilter = 'ALL' | 'TODO' | 'IN_PROGRESS' | 'DONE';
 

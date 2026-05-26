@@ -1,14 +1,14 @@
 'use client';
 
-import { ErrorState } from '@/app/app/todos/_components/error-state';
-import { TodoCreateButton } from '@/app/app/todos/_components/todo-create-button';
-import { TodoFilters } from '@/app/app/todos/_components/todo-filters';
-import { TodoList } from '@/app/app/todos/_components/todo-list';
+import { ErrorState } from '@/features/todos/list/components/error-state';
+import { TodoCreateButton } from '@/features/todos/list/components/todo-create-button';
+import { TodoFilters } from '@/features/todos/list/components/todo-filters';
+import { TodoList } from '@/features/todos/list/components/todo-list';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useTodos } from '@/hooks/useTodos';
-import { useTodoFiltersStore } from '@/store/useTodoFiltersStore';
+import { useTodos } from '@/features/todos/list/api/todos.hooks';
+import { useTodoFiltersStore } from '@/features/todos/list/hooks/use-todo-filters-store';
 
-export default function TodosPage() {
+export function TodosPageContent() {
   const { status, page } = useTodoFiltersStore();
   const { data, isLoading, error } = useTodos({
     status: status === 'ALL' ? undefined : status,

@@ -2,10 +2,10 @@
 
 import { ClipboardList } from 'lucide-react';
 
-import { TodoCreateButton } from '@/app/app/todos/_components/todo-create-button';
-import { TodoCard } from '@/app/app/todos/_components/todo-card';
+import { TodoCard } from '@/features/todos/list/components/todo-card';
+import { TodoCreateButton } from '@/features/todos/list/components/todo-create-button';
 
-import type { Todo } from '@/hooks/useTodos';
+import type { Todo } from '@/features/todos/list/api/todos.hooks';
 
 export function TodoList({ todos }: { todos: Todo[] }) {
   if (todos.length === 0) {

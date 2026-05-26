@@ -5,7 +5,7 @@ import Keycloak from 'next-auth/providers/keycloak';
 const keycloakIssuer = process.env.AUTH_KEYCLOAK_ISSUER;
 const keycloakClientSecret = process.env.AUTH_KEYCLOAK_SECRET;
 
-export const protectedHomePath = '/app/todos';
+export const protectedHomePath = '/todos';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [

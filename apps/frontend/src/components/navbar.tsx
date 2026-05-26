@@ -12,7 +12,7 @@ export function Navbar() {
         </Link>
         <nav className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/app/todos">Todos</Link>
+            <Link href="/todos">Todos</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link href="/login">Login</Link>

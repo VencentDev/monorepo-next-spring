@@ -3,8 +3,8 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-import { TodoFormSheet } from '@/app/app/todos/_components/todo-form-sheet';
 import { Button } from '@/components/ui/button';
+import { TodoFormSheet } from '@/features/todos/list/components/todo-form-sheet';
 
 export function TodoCreateButton({ label = 'New todo' }: { label?: string }) {
   const [open, setOpen] = useState(false);
