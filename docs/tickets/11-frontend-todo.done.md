@@ -15,18 +15,18 @@
 ### File: `src/app/app/todos/page.tsx`
 
 ```tsx
-"use client";
-import { useTodos } from "@/hooks/useTodos";
-import { useTodoFiltersStore } from "@/store/useTodoFiltersStore";
-import { TodoList } from "./_components/todo-list";
-import { TodoFilters } from "./_components/todo-filters";
-import { TodoCreateButton } from "./_components/todo-create-button";
-import { Skeleton } from "@/components/ui/skeleton";
+'use client';
+import { useTodos } from '@/hooks/useTodos';
+import { useTodoFiltersStore } from '@/store/useTodoFiltersStore';
+import { TodoList } from './_components/todo-list';
+import { TodoFilters } from './_components/todo-filters';
+import { TodoCreateButton } from './_components/todo-create-button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function TodosPage() {
   const { status } = useTodoFiltersStore();
   const { data, isLoading, error } = useTodos({
-    status: status === "ALL" ? undefined : status,
+    status: status === 'ALL' ? undefined : status,
   });
 
   return (
@@ -44,7 +44,13 @@ export default function TodosPage() {
 }
 
 function TodoListSkeleton() {
-  return <div className="space-y-2">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-16" />)}</div>;
+  return (
+    <div className="space-y-2">
+      {[...Array(5)].map((_, i) => (
+        <Skeleton key={i} className="h-16" />
+      ))}
+    </div>
+  );
 }
 ```
 
@@ -59,15 +65,23 @@ function TodoListSkeleton() {
 ### todo-filters.tsx
 
 ```tsx
-"use client";
-import { useTodoFiltersStore } from "@/store/useTodoFiltersStore";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+'use client';
+import { useTodoFiltersStore } from '@/store/useTodoFiltersStore';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function TodoFilters() {
   const { status, setStatus } = useTodoFiltersStore();
   return (
     <Select value={status} onValueChange={(v) => setStatus(v as any)}>
-      <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+      <SelectTrigger className="w-48">
+        <SelectValue />
+      </SelectTrigger>
       <SelectContent>
         <SelectItem value="ALL">All</SelectItem>
         <SelectItem value="TODO">To do</SelectItem>
@@ -101,23 +115,35 @@ When `data.content.length === 0`: show centered illustration/message + "Create y
 ### todo-form-sheet.tsx
 
 ```tsx
-"use client";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useCreateTodo, useUpdateTodo } from "@/hooks/useTodos";
-import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+'use client';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useCreateTodo, useUpdateTodo } from '@/hooks/useTodos';
+import { useToast } from '@/components/ui/use-toast';
+import { useState } from 'react';
 
-export function TodoFormSheet({ open, onOpenChange, todo }: {
-  open: boolean; onOpenChange: (v: boolean) => void; todo?: Todo;
+export function TodoFormSheet({
+  open,
+  onOpenChange,
+  todo,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  todo?: Todo;
 }) {
-  const [title, setTitle] = useState(todo?.title ?? "");
-  const [description, setDescription] = useState(todo?.description ?? "");
-  const [status, setStatus] = useState(todo?.status ?? "TODO");
-  const [dueDate, setDueDate] = useState(todo?.dueDate ?? "");
+  const [title, setTitle] = useState(todo?.title ?? '');
+  const [description, setDescription] = useState(todo?.description ?? '');
+  const [status, setStatus] = useState(todo?.status ?? 'TODO');
+  const [dueDate, setDueDate] = useState(todo?.dueDate ?? '');
   const create = useCreateTodo();
   const update = useUpdateTodo();
   const { toast } = useToast();
@@ -131,28 +157,36 @@ export function TodoFormSheet({ open, onOpenChange, todo }: {
             title: title === todo.title ? undefined : title,
             description: description === todo.description ? undefined : description,
             status: status === todo.status ? undefined : status,
-            dueDate: dueDate === (todo.dueDate ?? "") ? undefined : (dueDate || null),
+            dueDate: dueDate === (todo.dueDate ?? '') ? undefined : dueDate || null,
           },
         });
       } else {
         await create.mutateAsync({ title, description, status, dueDate: dueDate || undefined });
       }
-      toast({ title: todo ? "Updated" : "Created" });
+      toast({ title: todo ? 'Updated' : 'Created' });
       onOpenChange(false);
     } catch (e: any) {
-      toast({ title: "Failed", description: String(e?.message ?? e), variant: "destructive" });
+      toast({ title: 'Failed', description: String(e?.message ?? e), variant: 'destructive' });
     }
   }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
-        <SheetHeader><SheetTitle>{todo ? "Edit todo" : "New todo"}</SheetTitle></SheetHeader>
+        <SheetHeader>
+          <SheetTitle>{todo ? 'Edit todo' : 'New todo'}</SheetTitle>
+        </SheetHeader>
         <div className="space-y-4 py-4">
           <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-          <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" />
+          <Textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Description"
+          />
           <Select value={status} onValueChange={setStatus as any}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="TODO">To do</SelectItem>
               <SelectItem value="IN_PROGRESS">In progress</SelectItem>
@@ -160,7 +194,9 @@ export function TodoFormSheet({ open, onOpenChange, todo }: {
             </SelectContent>
           </Select>
           <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-          <Button onClick={onSubmit} className="w-full">Save</Button>
+          <Button onClick={onSubmit} className="w-full">
+            Save
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
@@ -171,6 +207,7 @@ export function TodoFormSheet({ open, onOpenChange, todo }: {
 ### PATCH semantics — CRITICAL
 
 The form sends:
+
 - key **absent** → field untouched (`undefined` in JSON → omitted by `JSON.stringify`)
 - key with `null` → field cleared on backend (e.g., user clears `dueDate`)
 - key with value → field updated
@@ -211,12 +248,12 @@ onMutate: async ({ id, body }) => {
 ```tsx
 const del = useDeleteTodo();
 async function onDelete(id: string) {
-  if (!confirm("Delete this todo?")) return;
+  if (!confirm('Delete this todo?')) return;
   try {
     await del.mutateAsync(id);
-    toast({ title: "Deleted" });
+    toast({ title: 'Deleted' });
   } catch (e: any) {
-    toast({ title: "Failed", description: String(e?.message ?? e), variant: "destructive" });
+    toast({ title: 'Failed', description: String(e?.message ?? e), variant: 'destructive' });
   }
 }
 ```
@@ -239,21 +276,23 @@ In `apiFetch` (ticket 10), `ApiError.status` carries the response code.
 ### File: `src/app/app/todos/_components/error-state.tsx`
 
 ```tsx
-"use client";
-import { ApiError } from "@/lib/api";
-import { signIn } from "next-auth/react";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
+'use client';
+import { ApiError } from '@/lib/api';
+import { signIn } from 'next-auth/react';
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 
 export function ErrorState({ error }: { error: unknown }) {
   useEffect(() => {
-    if (error instanceof ApiError && error.status === 401) signIn("keycloak");
+    if (error instanceof ApiError && error.status === 401) signIn('keycloak');
   }, [error]);
 
   if (error instanceof ApiError) {
     if (error.status === 401) return <p>Redirecting to sign in…</p>;
-    if (error.status === 403) return <InlineError title="Forbidden" message="You don't have access." />;
-    if (error.status === 404) return <InlineError title="Not found" message="That todo doesn't exist." />;
+    if (error.status === 403)
+      return <InlineError title="Forbidden" message="You don't have access." />;
+    if (error.status === 404)
+      return <InlineError title="Not found" message="That todo doesn't exist." />;
   }
   return <InlineError title="Something went wrong" message="Please try again." />;
 }
@@ -273,15 +312,15 @@ function InlineError({ title, message }: { title: string; message: string }) {
 If `session.error === "RefreshAccessTokenError"` (set by ticket 09 jwt callback), force re-auth:
 
 ```tsx
-"use client";
-import { useSession } from "next-auth/react";
-import { signIn } from "next-auth/react";
-import { useEffect } from "react";
+'use client';
+import { useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
+import { useEffect } from 'react';
 
 export function SessionErrorGate({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   useEffect(() => {
-    if (session?.error === "RefreshAccessTokenError") signIn("keycloak");
+    if (session?.error === 'RefreshAccessTokenError') signIn('keycloak');
   }, [session?.error]);
   return <>{children}</>;
 }

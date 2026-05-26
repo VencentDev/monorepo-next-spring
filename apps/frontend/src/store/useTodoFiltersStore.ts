@@ -3,17 +3,18 @@ import { create } from 'zustand';
 import type { paths } from '@app/api-types';
 
 type TodoStatus = NonNullable<paths['/api/v1/todos']['get']['parameters']['query']>['status'];
+type TodoStatusFilter = TodoStatus | 'ALL';
 
 export type TodoFiltersState = {
-  status?: TodoStatus;
+  status: TodoStatusFilter;
   page: number;
-  setStatus: (status?: TodoStatus) => void;
+  setStatus: (status: TodoStatusFilter) => void;
   setPage: (page: number) => void;
   reset: () => void;
 };
 
 const initialState = {
-  status: undefined,
+  status: 'ALL' as const,
   page: 0,
 };
 

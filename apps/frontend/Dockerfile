@@ -17,6 +17,7 @@ RUN pnpm --filter @app/frontend build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3000
 RUN addgroup --system app && adduser --system --ingroup app app
 COPY --from=build /repo/apps/frontend/.next/standalone ./
 COPY --from=build /repo/apps/frontend/.next/static ./apps/frontend/.next/static

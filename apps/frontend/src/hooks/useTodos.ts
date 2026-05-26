@@ -13,7 +13,9 @@ type ListResp = paths['/api/v1/todos']['get']['responses']['200']['content']['ap
 type CreateBody = paths['/api/v1/todos']['post']['requestBody']['content']['application/json'];
 type UpdateBody =
   paths['/api/v1/todos/{id}']['patch']['requestBody']['content']['application/json'];
-type Todo = paths['/api/v1/todos']['post']['responses']['201']['content']['application/json'];
+export type Todo =
+  paths['/api/v1/todos']['post']['responses']['201']['content']['application/json'];
+export type TodoStatus = Todo['status'];
 type TodoFilters = Pick<NonNullable<ListParams>, 'status' | 'page'>;
 
 function applyTodoPatch(todo: Todo, body: UpdateBody): Todo {
@@ -58,7 +60,46 @@ export function useCreateTodo() {
         method: 'POST',
         body: JSON.stringify(body),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.todos.all() }),
+    onMutate: async (body) => {
+      await qc.cancelQueries({ queryKey: qk.todos.all() });
+
+      const previousLists = qc.getQueriesData<ListResp>({
+        queryKey: qk.todos.lists(),
+      });
+      const now = new Date().toISOString();
+      const optimisticTodo: Todo = {
+        id: `optimistic-${crypto.randomUUID()}`,
+        title: body.title,
+        description: body.description ?? null,
+        status: body.status,
+        dueDate: body.dueDate ?? null,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      previousLists.forEach(([key, data]) => {
+        if (!data) {
+          return;
+        }
+
+        const filters = Array.isArray(key) ? (key[2] as TodoFilters | undefined) : undefined;
+        if (filters?.status && filters.status !== optimisticTodo.status) {
+          return;
+        }
+
+        qc.setQueryData<ListResp>(key, {
+          ...data,
+          content: [optimisticTodo, ...data.content],
+          totalElements: data.totalElements + 1,
+        });
+      });
+
+      return { previousLists };
+    },
+    onError: (_e, _body, context) => {
+      context?.previousLists.forEach(([key, data]) => qc.setQueryData(key, data));
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: qk.todos.all() }),
   });
 }
 
@@ -119,6 +160,44 @@ export function useDeleteTodo() {
       clientApi<void>(session?.accessToken, `/api/v1/todos/${id}`, {
         method: 'DELETE',
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.todos.all() }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: qk.todos.all() });
+
+      const previousLists = qc.getQueriesData<ListResp>({
+        queryKey: qk.todos.lists(),
+      });
+      const previousDetail = qc.getQueryData<Todo>(qk.todos.detail(id));
+
+      qc.setQueriesData<ListResp>({ queryKey: qk.todos.lists() }, (data) => {
+        if (!data) {
+          return data;
+        }
+
+        const nextContent = data.content.filter((todo) => todo.id !== id);
+
+        return {
+          ...data,
+          content: nextContent,
+          totalElements:
+            nextContent.length === data.content.length
+              ? data.totalElements
+              : Math.max(0, data.totalElements - 1),
+        };
+      });
+      qc.removeQueries({ queryKey: qk.todos.detail(id) });
+
+      return { previousLists, previousDetail };
+    },
+    onError: (_e, id, context) => {
+      context?.previousLists.forEach(([key, data]) => qc.setQueryData(key, data));
+
+      if (context?.previousDetail) {
+        qc.setQueryData(qk.todos.detail(id), context.previousDetail);
+      }
+    },
+    onSettled: (_data, _error, id) => {
+      void qc.invalidateQueries({ queryKey: qk.todos.all() });
+      void qc.invalidateQueries({ queryKey: qk.todos.detail(id) });
+    },
   });
 }
