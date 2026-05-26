@@ -66,17 +66,17 @@ End-to-end flow: login → create todo → see it → edit → delete.
 ### Test outline
 
 ```ts
-test("auth + crud", async ({ page }) => {
-  await page.goto("/app/todos");
-  await page.getByRole("textbox", { name: "Username" }).fill("tester");
-  await page.getByRole("textbox", { name: "Password" }).fill("password");
-  await page.getByRole("button", { name: "Sign In" }).click();
+test('auth + crud', async ({ page }) => {
+  await page.goto('/app/todos');
+  await page.getByRole('textbox', { name: 'Username' }).fill('tester');
+  await page.getByRole('textbox', { name: 'Password' }).fill('password');
+  await page.getByRole('button', { name: 'Sign In' }).click();
   await expect(page).toHaveURL(/\/app\/todos/);
   // create
-  await page.getByRole("button", { name: "New todo" }).click();
-  await page.getByPlaceholder("Title").fill("Buy milk");
-  await page.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByText("Buy milk")).toBeVisible();
+  await page.getByRole('button', { name: 'New todo' }).click();
+  await page.getByPlaceholder('Title').fill('Buy milk');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByText('Buy milk')).toBeVisible();
 });
 ```
 

@@ -56,6 +56,7 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 >
 > **Option A — Realm export JSON (`infra/keycloak/realm-export.json`):**
 > Add an entry under `identityProviders`:
+>
 > ```json
 > {
 >   "identityProviders": [
@@ -71,6 +72,7 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 >   ]
 > }
 > ```
+>
 > Set env vars in `infra/docker-compose.yml` for the `keycloak` service. Same shape for GitHub (`"providerId": "github"`).
 >
 > **Option B — Keycloak admin console:**
@@ -101,15 +103,19 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 - **Date:** YYYY-MM-DD
 
 ## Context
+
 <What problem are we deciding about?>
 
 ## Decision
+
 <What did we pick?>
 
 ## Consequences
+
 <What follows? Trade-offs, what we lose, what we gain.>
 
 ## Alternatives considered
+
 <Other options + why we passed.>
 ```
 
@@ -118,10 +124,12 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 **Decision:** Use Keycloak in docker-compose with realm import.
 
 **Alternatives considered:**
+
 - Auth.js handling OAuth directly against Google/GitHub
 - Spring Authorization Server
 
 **Key points:**
+
 - Future identity brokers (Google, GitHub, SAML) added in Keycloak with zero app code change
 - Single JWT issuer simplifies backend Resource Server config
 - Self-hosted = portable; same setup local/staging/prod
@@ -132,10 +140,12 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 **Decision:** Each feature is a vertical slice: `modules/<name>/{controller,service,repository,entity,dto,mapper}`.
 
 **Alternatives considered:**
+
 - Flat layered: `controller/`, `service/`, `repository/` at top level
 - Hexagonal/clean-architecture with adapters
 
 **Key points:**
+
 - Slices stay cohesive when the team grows
 - Easy to lift a module into a separate service later
 - Drawback: cross-module references look longer (`modules.user.entity.User`)
@@ -145,10 +155,12 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 **Decision:** Spring Boot 4.0.6 + Spring Security 7 + springdoc-openapi 3.0.x.
 
 **Alternatives considered:**
+
 - Stay on Boot 3.x LTS
 - Boot 4 with springdoc 2.x (incompatible)
 
 **Key points:**
+
 - Boot 4 GA aligns with Jackson 3 and Java 21+ idioms
 - Spring Security 7 has minor API renames vs 6.x — pin docs
 - springdoc 2.x does NOT support Boot 4 — must use 3.0.x line
@@ -159,6 +171,7 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 **Decision:** Maven (`pom.xml`, `mvnw`).
 
 **Reasoning (capture the actual one — template default below):**
+
 - Initializr default; less moving parts than Groovy/Kotlin DSL
 - `pnpm` script wrapper hides Maven from frontend devs
 - Annotation processor ordering is explicit in `pom.xml` (critical for Lombok+MapStruct)
@@ -167,16 +180,19 @@ Top-level README (prereqs, one-command start, architecture, extension guides) + 
 ### ADR-005 — Lombok for entities, records for DTOs (and `JsonNullable` PATCH convention)
 
 **Decision:**
+
 - Entities: Lombok-based, mutable, ID-only `equals/hashCode`
 - DTOs: Java records
 - PATCH DTOs: records with `JsonNullable<T>` fields
 
 **Alternatives considered:**
+
 - Records for entities — fails because JPA needs mutable + no-arg constructor
 - DTOs with Lombok — works but no value, more annotations
 - PATCH via plain `T` fields with sentinel values — ambiguous between "absent" and "set to null"
 
 **Key points:**
+
 - Entity `equals/hashCode` ID-only avoids Hibernate proxy pitfalls
 - Records integrate with Jackson/Bean Validation/MapStruct natively
 - `JsonNullable<T>` is the only correct way to express PATCH semantics in a typed DTO

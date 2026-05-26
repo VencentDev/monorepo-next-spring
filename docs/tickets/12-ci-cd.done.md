@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: '21'
           cache: maven
       - name: Run tests
         working-directory: apps/backend
@@ -44,7 +44,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Generate API types (from committed openapi.json)
@@ -132,26 +132,26 @@ jobs:
 If `packages/api-types/openapi.json` is committed, add a check to fail CI when it's stale:
 
 ```yaml
-  openapi-fresh:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env: { POSTGRES_PASSWORD: postgres }
-        ports: ["5432:5432"]
-        options: --health-cmd "pg_isready" --health-interval 5s --health-retries 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: "21", cache: maven }
-      - name: Start backend
-        working-directory: apps/backend
-        env:
-          SPRING_PROFILES_ACTIVE: dev
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
-        run: ./mvnw spring-boot:start
-      - run: curl -sf http://localhost:8080/v3/api-docs > /tmp/current.json
-      - run: diff <(jq -S . packages/api-types/openapi.json) <(jq -S . /tmp/current.json)
+openapi-fresh:
+  runs-on: ubuntu-latest
+  services:
+    postgres:
+      image: postgres:16
+      env: { POSTGRES_PASSWORD: postgres }
+      ports: ['5432:5432']
+      options: --health-cmd "pg_isready" --health-interval 5s --health-retries 10
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with: { distribution: temurin, java-version: '21', cache: maven }
+    - name: Start backend
+      working-directory: apps/backend
+      env:
+        SPRING_PROFILES_ACTIVE: dev
+        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+      run: ./mvnw spring-boot:start
+    - run: curl -sf http://localhost:8080/v3/api-docs > /tmp/current.json
+    - run: diff <(jq -S . packages/api-types/openapi.json) <(jq -S . /tmp/current.json)
 ```
 
 ---

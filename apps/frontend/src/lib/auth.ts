@@ -3,6 +3,7 @@ import type { JWT } from 'next-auth/jwt';
 import Keycloak from 'next-auth/providers/keycloak';
 
 const keycloakIssuer = process.env.AUTH_KEYCLOAK_ISSUER;
+const keycloakClientSecret = process.env.AUTH_KEYCLOAK_SECRET;
 
 export const protectedHomePath = '/app/todos';
 
@@ -10,9 +11,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Keycloak({
       clientId: process.env.AUTH_KEYCLOAK_ID!,
-      clientSecret: process.env.AUTH_KEYCLOAK_SECRET ?? '',
+      clientSecret: keycloakClientSecret,
       issuer: keycloakIssuer,
       authorization: { params: { scope: 'openid profile email' } },
+      client: {
+        token_endpoint_auth_method: keycloakClientSecret ? 'client_secret_basic' : 'none',
+      },
       checks: ['pkce', 'state'],
     }),
   ],
@@ -57,8 +61,8 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         client_id: process.env.AUTH_KEYCLOAK_ID!,
-        client_secret: process.env.AUTH_KEYCLOAK_SECRET ?? '',
         refresh_token: token.refreshToken,
+        ...(keycloakClientSecret ? { client_secret: keycloakClientSecret } : {}),
       }),
     });
 

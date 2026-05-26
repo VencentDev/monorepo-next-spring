@@ -2,7 +2,7 @@
   "name": "@app/backend",
   "private": true,
   "scripts": {
-    "dev": "./mvnw spring-boot:run",
+    "dev": "set -a && [ ! -f .env ] || . ./.env && set +a && ./mvnw spring-boot:run",
     "build": "./mvnw clean package -DskipTests",
     "test": "./mvnw test",
     "lint": "./mvnw spotless:check",
