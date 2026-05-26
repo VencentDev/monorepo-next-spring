@@ -7,17 +7,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class IntegrationTestBase {
 
-  @Container static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
+  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
 
   static {
     postgres.start();

@@ -40,6 +40,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
             .map(authority -> authority.startsWith("ROLE_") ? authority.substring(5) : authority)
             .collect(Collectors.toSet());
 
-    return new AuthenticatedUser(jwt.getSubject(), jwt.getClaimAsString("email"), roles);
+    return new AuthenticatedUser(
+        jwt.getSubject(), jwt.getClaimAsString("email"), jwt.getClaimAsString("name"), roles);
   }
 }

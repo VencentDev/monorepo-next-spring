@@ -234,14 +234,17 @@ public class JacksonConfig {
 ### Required test cases
 
 **Repo:**
+
 - `findByExternalId` returns row
 - `existsByEmail` works on duplicates
 
 **Service:**
+
 - `findOrProvision` inserts on first call, returns existing on second
 - `updateMe` applies present-only fields
 
 **Controller — PATCH semantics (CRITICAL):**
+
 - `{}` → no changes
 - `{"email": null}` (i.e. `JsonNullable` set-to-null) → email cleared
 - `{"email": "new@x"}` → email updated
