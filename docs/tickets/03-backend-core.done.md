@@ -234,7 +234,7 @@ Pull `traceId` from MDC (set by `RequestIdFilter`, T1.5).
 - `src/main/resources/db/migration/V1__init.sql`
 - `com/backend/backend/common/persistence/AuditableEntity.java`
 
-### V1__init.sql
+### V1\_\_init.sql
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
