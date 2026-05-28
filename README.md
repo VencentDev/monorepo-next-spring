@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository is a full-stack todo application used as a production-shaped reference for a Next.js frontend, Spring Boot backend, Keycloak authentication, Postgres persistence, generated OpenAPI TypeScript types, and GitHub Actions image publishing.
+This repository is a full-stack todo application used as a production-shaped reference for a Next.js frontend, Spring Boot backend, direct Google/GitHub OAuth login, Postgres persistence, generated OpenAPI TypeScript types, and GitHub Actions image publishing.
 
 ## Prerequisites
 
@@ -15,11 +15,10 @@ This repository is a full-stack todo application used as a production-shaped ref
 
 ```bash
 make dev
-# Postgres :5432, Keycloak :8081, backend :8080, frontend :3000
-# log in as tester / password
+# Postgres :5432, backend :8080, frontend :3000
 ```
 
-Open `http://localhost:3000/app/todos`. The protected route redirects to Keycloak when you are not signed in.
+Open `http://localhost:3000/todos`. The protected route redirects to Google/GitHub login when you are not signed in.
 
 ## Architecture
 
@@ -27,10 +26,11 @@ Open `http://localhost:3000/app/todos`. The protected route redirects to Keycloa
 flowchart LR
   Browser -->|HTTP| Next[Next.js frontend :3000]
   Next -->|API requests| Spring[Spring Boot backend :8080]
-  Next -->|Auth.js OIDC| Keycloak[Keycloak :8081]
-  Spring -->|JWT issuer/JWK validation| Keycloak
+  Next -->|Auth.js OAuth| Google[Google OAuth]
+  Next -->|Auth.js OAuth| GitHub[GitHub OAuth]
+  Spring -->|Bearer token userinfo lookup| Google
+  Spring -->|Bearer token userinfo lookup| GitHub
   Spring -->|JPA/Flyway| Postgres[(Postgres :5432)]
-  Keycloak -->|realm data| Postgres
 ```
 
 ## Repo Layout
@@ -43,7 +43,6 @@ packages/
   api-types/     TypeScript types generated from OpenAPI
 infra/
   docker-compose.yml
-  keycloak/      Local realm export
   postgres/      Local database initialization
 docs/
   adr/           Architecture decision records
@@ -78,37 +77,9 @@ Keep these layers separate. Do not copy API entities into Zustand, and do not us
 5. Add a Zustand store only for ephemeral UI state such as filters, selected tabs, or drawer state.
 6. Keep shared UI primitives in `apps/frontend/src/components/ui`.
 
-## Add Google or GitHub Login
+## Configure Google and GitHub Login
 
-**The whole point of the Keycloak-as-IdP choice:** adding Google or GitHub as a login option does NOT change any frontend or backend code.
-
-**Option A - Realm export JSON (`infra/keycloak/realm-export.json`):**
-Add an entry under `identityProviders`:
-
-```json
-{
-  "identityProviders": [
-    {
-      "alias": "google",
-      "providerId": "google",
-      "enabled": true,
-      "config": {
-        "clientId": "${GOOGLE_CLIENT_ID}",
-        "clientSecret": "${GOOGLE_CLIENT_SECRET}"
-      }
-    }
-  ]
-}
-```
-
-Set env vars in `infra/docker-compose.yml` for the `keycloak` service. Same shape for GitHub (`"providerId": "github"`).
-
-**Option B - Keycloak admin console:**
-`http://localhost:8081` -> admin login -> realm `app` -> Identity Providers -> Add provider -> Google/GitHub -> paste client ID and secret from the OAuth app you created in the respective console.
-
-Add redirect URI to the OAuth app: `http://localhost:8081/realms/app/broker/<alias>/endpoint`.
-
-Done. The Keycloak login page will now show "Sign in with Google" alongside the username/password form.
+See [`docs/google-github-oauth-setup.md`](docs/google-github-oauth-setup.md) for the required Google/GitHub OAuth apps, callback URLs, and local environment variables.
 
 ## Testing
 
