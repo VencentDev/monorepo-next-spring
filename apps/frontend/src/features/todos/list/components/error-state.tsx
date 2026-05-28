@@ -9,7 +9,7 @@ import { ApiError } from '@/lib/api';
 export function ErrorState({ error }: { error: unknown }) {
   useEffect(() => {
     if (error instanceof ApiError && error.status === 401) {
-      void signIn('keycloak');
+      void signIn();
     }
   }, [error]);
 
@@ -20,7 +20,7 @@ export function ErrorState({ error }: { error: unknown }) {
           title="Redirecting to sign in"
           message="Your session needs to be refreshed."
           action={
-            <Button size="sm" onClick={() => void signIn('keycloak')}>
+            <Button size="sm" onClick={() => void signIn()}>
               Sign in
             </Button>
           }

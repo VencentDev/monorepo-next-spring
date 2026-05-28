@@ -16,9 +16,9 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
-import { useCreateTodo, useUpdateTodo } from '@/hooks/useTodos';
+import { useCreateTodo, useUpdateTodo } from '@/features/todos/list/api/todos.hooks';
 
-import type { Todo, TodoStatus } from '@/hooks/useTodos';
+import type { Todo, TodoStatus } from '@/features/todos/list/api/todos.hooks';
 
 export function TodoFormSheet({
   open,

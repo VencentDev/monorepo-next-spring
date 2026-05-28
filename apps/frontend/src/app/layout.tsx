@@ -6,7 +6,7 @@ import { Navbar } from '@/components/navbar';
 import { Providers } from '@/components/providers';
 import { ThemeProvider } from '@/components/theme-provider';
 
-import './globals.css';
+import '@/styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 

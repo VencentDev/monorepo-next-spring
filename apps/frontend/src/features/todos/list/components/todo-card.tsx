@@ -3,14 +3,14 @@
 import { CalendarDays, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-import { TodoFormSheet } from '@/app/app/todos/_components/todo-form-sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { useDeleteTodo } from '@/hooks/useTodos';
+import { useDeleteTodo } from '@/features/todos/list/api/todos.hooks';
+import { TodoFormSheet } from '@/features/todos/list/components/todo-form-sheet';
 
-import type { Todo } from '@/hooks/useTodos';
+import type { Todo } from '@/features/todos/list/api/todos.hooks';
 
 const statusLabel: Record<Todo['status'], string> = {
   TODO: 'To do',
