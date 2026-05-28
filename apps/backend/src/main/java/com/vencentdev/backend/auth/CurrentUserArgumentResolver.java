@@ -29,6 +29,10 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
       NativeWebRequest webRequest,
       WebDataBinderFactory binderFactory) {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedUser user) {
+      return user;
+    }
+
     if (!(authentication instanceof JwtAuthenticationToken token)) {
       return null;
     }

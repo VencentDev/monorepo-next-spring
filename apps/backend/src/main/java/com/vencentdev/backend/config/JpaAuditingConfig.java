@@ -1,5 +1,6 @@
 package com.vencentdev.backend.config;
 
+import com.vencentdev.backend.auth.AuthenticatedUser;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,9 @@ public class JpaAuditingConfig {
         return Optional.of("system");
       }
       Object principal = authentication.getPrincipal();
+      if (principal instanceof AuthenticatedUser user) {
+        return Optional.of(user.subject());
+      }
       if (principal instanceof Jwt jwt) {
         return Optional.ofNullable(jwt.getSubject()).or(() -> Optional.of("system"));
       }
