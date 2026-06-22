@@ -50,6 +50,40 @@ jobs:
       - name: Test frontend
         run: pnpm --filter @app/frontend test --if-present
 
+  mobile-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Generate API client
+        working-directory: apps/mobile
+        run: |
+          dart run swagger_parser
+          dart run build_runner build -d
+          # Normalize generated code; the gate below then only flags hand-written drift.
+          dart format lib/src/api/generated
+
+      - name: Check formatting
+        working-directory: apps/mobile
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Test
+        working-directory: apps/mobile
+        run: flutter test
+
   build-images:
     needs: [backend-test, frontend-test]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'

@@ -38,6 +38,9 @@
     ],
     "apps/backend/**/*.java": [
       "bash -c 'cd apps/backend && ./mvnw spotless:apply'"
+    ],
+    "apps/mobile/**/*.dart": [
+      "dart format"
     ]
   }
 }
