@@ -1,4 +1,4 @@
-.PHONY: dev infra seed reset backend-dev spring-dev backend-test backend-build down
+.PHONY: dev infra seed reset backend-dev spring-dev backend-test backend-build down mobile-gen mobile-run mobile-test
 
 dev:
 	docker compose -f infra/docker-compose.yml up -d
@@ -26,3 +26,12 @@ backend-build:
 
 down:
 	docker compose -f infra/docker-compose.yml down
+
+mobile-gen:
+	cd apps/mobile && flutter pub get && dart run swagger_parser && dart run build_runner build -d
+
+mobile-run:
+	cd apps/mobile && flutter run
+
+mobile-test:
+	cd apps/mobile && flutter analyze && flutter test

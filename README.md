@@ -39,6 +39,7 @@ flowchart LR
 apps/
   backend/       Spring Boot API, Flyway migrations, tests
   frontend/      Next.js app, Auth.js, TanStack Query, shadcn/ui
+  mobile/        Flutter app, Riverpod, Dio, generated OpenAPI client
 packages/
   api-types/     TypeScript types generated from OpenAPI
 infra/
@@ -88,6 +89,7 @@ make backend-test
 pnpm --filter @app/frontend lint
 pnpm --filter @app/frontend typecheck
 pnpm --filter @app/frontend test --if-present
+make mobile-test   # flutter analyze && flutter test (see apps/mobile/README.md)
 ```
 
 The backend tests use Testcontainers for Postgres. The frontend test script is currently a placeholder until a Jest, Vitest, or Playwright suite is added.
@@ -96,7 +98,7 @@ The backend tests use Testcontainers for Postgres. The frontend test script is c
 
 GitHub Actions is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-- Pull requests run backend and frontend test jobs.
+- Pull requests run backend, frontend, and mobile (Flutter analyze + test) jobs.
 - Pushes to `main` run tests and publish images to GHCR:
   - `ghcr.io/<owner>/<repo>/backend:latest`
   - `ghcr.io/<owner>/<repo>/backend:<sha>`
