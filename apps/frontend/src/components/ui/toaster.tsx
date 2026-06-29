@@ -1,41 +1,22 @@
 'use client';
 
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-} from '@/components/ui/toast';
-import { removeToast, useToast } from '@/components/ui/use-toast';
+import { Toaster as SonnerToaster } from 'sonner';
 
 export function Toaster() {
-  const { toasts } = useToast();
-
   return (
-    <ToastProvider>
-      {toasts.map(({ id, title, description, action, ...props }) => (
-        <Toast
-          key={id}
-          {...props}
-          onOpenChange={(open) => {
-            props.onOpenChange?.(open);
-
-            if (!open) {
-              removeToast(id);
-            }
-          }}
-        >
-          <div className="grid gap-1">
-            {title && <ToastTitle>{title}</ToastTitle>}
-            {description && <ToastDescription>{description}</ToastDescription>}
-          </div>
-          {action}
-          <ToastClose />
-        </Toast>
-      ))}
-      <ToastViewport />
-    </ToastProvider>
+    <SonnerToaster
+      closeButton
+      richColors
+      position="bottom-right"
+      toastOptions={{
+        classNames: {
+          toast: 'border bg-background text-foreground',
+          description: 'text-muted-foreground',
+          actionButton: 'bg-primary text-primary-foreground',
+          cancelButton: 'bg-muted text-muted-foreground',
+        },
+      }}
+      visibleToasts={5}
+    />
   );
 }
