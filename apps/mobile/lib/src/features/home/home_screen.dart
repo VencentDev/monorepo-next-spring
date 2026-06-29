@@ -64,7 +64,7 @@ class HomeScreen extends ConsumerWidget {
                 const Padding(
                   padding: EdgeInsets.only(top: 12),
                   child: Text(
-                    'Set GOOGLE_CLIENT_ID and GOOGLE_REDIRECT_URL via --dart-define.',
+                    'Set GOOGLE_CLIENT_ID and GOOGLE_REDIRECT_URL in .env and run with --dart-define-from-file=.env.',
                     textAlign: TextAlign.center,
                   ),
                 ),

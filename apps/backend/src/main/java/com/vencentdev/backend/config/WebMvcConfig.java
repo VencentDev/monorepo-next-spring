@@ -1,6 +1,6 @@
 package com.vencentdev.backend.config;
 
-import com.vencentdev.backend.auth.CurrentUserArgumentResolver;
+import com.vencentdev.backend.modules.auth.CurrentUserArgumentResolver;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;

@@ -1,8 +1,8 @@
 package com.vencentdev.backend.config;
 
-import com.vencentdev.backend.auth.oauth.OAuthProviderAuthenticationFilter;
-import com.vencentdev.backend.auth.ratelimit.AuthRateLimitFilter;
-import com.vencentdev.backend.auth.ratelimit.AuthRateLimitProperties;
+import com.vencentdev.backend.modules.auth.oauth.OAuthProviderAuthenticationFilter;
+import com.vencentdev.backend.modules.auth.ratelimit.AuthRateLimitFilter;
+import com.vencentdev.backend.modules.auth.ratelimit.AuthRateLimitProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

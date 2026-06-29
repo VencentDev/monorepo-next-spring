@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useSyncExternalStore } from 'react';
+import { toast as sonnerToast } from 'sonner';
 
 import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 import type { ReactNode } from 'react';
@@ -9,59 +9,38 @@ export type ToastInput = ToastProps & {
   action?: ToastActionElement;
   title?: ReactNode;
   description?: ReactNode;
+  variant?: 'default' | 'destructive';
 };
-
-type ToastRecord = ToastInput & {
-  id: string;
-};
-
-let toasts: ToastRecord[] = [];
-const listeners = new Set<() => void>();
-
-function emit() {
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
-function getSnapshot() {
-  return toasts;
-}
 
 export function toast(input: ToastInput) {
-  const id = crypto.randomUUID();
-
-  toasts = [{ ...input, id, open: true }, ...toasts].slice(0, 5);
-  emit();
+  const { title, description, action, variant, duration, id } = input;
+  const message = title ?? description;
+  const options = {
+    action,
+    description: title ? description : undefined,
+    duration,
+    id,
+  };
+  const toastId =
+    variant === 'destructive' ? sonnerToast.error(message, options) : sonnerToast(message, options);
 
   return {
-    id,
-    dismiss: () => dismissToast(id),
+    id: toastId,
+    dismiss: () => dismissToast(toastId),
   };
 }
 
-export function dismissToast(id: string) {
-  toasts = toasts.map((item) => (item.id === id ? { ...item, open: false } : item));
-  emit();
+export function dismissToast(id?: string | number) {
+  sonnerToast.dismiss(id);
 }
 
-export function removeToast(id: string) {
-  toasts = toasts.filter((item) => item.id !== id);
-  emit();
+export function removeToast(id?: string | number) {
+  sonnerToast.dismiss(id);
 }
 
 export function useToast() {
-  const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const stableToast = useCallback((input: ToastInput) => toast(input), []);
-
   return {
-    toast: stableToast,
-    toasts: state,
+    toast,
+    toasts: [],
   };
 }

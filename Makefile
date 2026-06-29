@@ -31,7 +31,7 @@ mobile-gen:
 	cd apps/mobile && flutter pub get && dart run swagger_parser && dart run build_runner build -d
 
 mobile-run:
-	cd apps/mobile && flutter run
+	cd apps/mobile && flutter run --dart-define-from-file=.env
 
 mobile-test:
 	cd apps/mobile && flutter analyze && flutter test
