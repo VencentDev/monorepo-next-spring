@@ -25,14 +25,16 @@ is git-ignored and regenerated in CI.
 ## Configuration
 
 Auth uses native Google OAuth; the access token is sent to the backend as a
-bearer token (ADR-006). Provide config via `--dart-define`:
+bearer token (ADR-006). Create a local `.env` from `.env.example`, then run:
 
 ```bash
-flutter run \
-  --dart-define=API_BASE_URL=http://10.0.2.2:8080 \
-  --dart-define=GOOGLE_CLIENT_ID=ID.apps.googleusercontent.com \
-  --dart-define=GOOGLE_REDIRECT_URL=com.googleusercontent.apps.ID:/oauth2redirect
+cp .env.example .env
+flutter run --dart-define-from-file=.env
 ```
+
+`make -C ../.. mobile-run` passes the same `.env` file. If launching from an
+IDE, add `--dart-define-from-file=.env` to the Flutter tool arguments for the
+mobile run configuration.
 
 - `10.0.2.2` is the Android emulator's alias for the host's `localhost`.
 - The redirect scheme (reversed client ID) must also be set as the platform URL
