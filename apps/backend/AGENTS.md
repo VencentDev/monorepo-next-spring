@@ -6,29 +6,56 @@ These rules apply to the Spring Boot backend in:
 - `apps/backend/src/main/resources/**`
 - `apps/backend/src/test/java/com/vencentdev/backend/**`
 
-This app is a Java 21 Spring Boot MVC API backed by PostgreSQL, JPA, Flyway, MapStruct, Lombok, Spring Security, and Testcontainers. Keep backend changes aligned with the existing feature package structure and avoid introducing alternate architectural styles unless the codebase is intentionally migrated.
+This app is a Java 21 Spring Boot MVC API backed by PostgreSQL, JPA, Flyway, MapStruct, Lombok, Spring Security, and Testcontainers. Keep backend changes aligned with the existing module package structure and avoid introducing alternate architectural styles unless the codebase is intentionally migrated.
 
 ## Package Structure
 
-Use feature-first packages under `com.vencentdev.backend`.
+Use module-first packages under `com.vencentdev.backend.modules`.
 
-Current feature examples:
+Current module examples:
 
-- `auth/**`
-- `todo/**`
-- `user/**`
+- `modules/auth/**`
+- `modules/todo/**`
+- `modules/user/**`
 
-For normal business features, prefer this shape:
+All business modules must live under:
 
-- `<feature>/controller/*Controller.java`
-- `<feature>/service/*Service.java`
-- `<feature>/service/*ServiceImpl.java`
-- `<feature>/dto/*Request.java`
-- `<feature>/dto/*Response.java`
-- `<feature>/entity/*`
-- `<feature>/repository/*Repository.java`
-- `<feature>/mapper/*Mapper.java`
-- `<feature>/validation/*` when validation is feature-specific
+- `src/main/java/com/vencentdev/backend/modules/<module>/**`
+- `src/test/java/com/vencentdev/backend/modules/<module>/**`
+
+For normal business modules, prefer this shape:
+
+- `modules/<module>/controller/*Controller.java`
+- `modules/<module>/service/*Service.java`
+- `modules/<module>/service/*ServiceImpl.java`
+- `modules/<module>/dto/*Request.java`
+- `modules/<module>/dto/*Response.java`
+- `modules/<module>/entity/*`
+- `modules/<module>/enums/*`
+- `modules/<module>/repository/*Repository.java`
+- `modules/<module>/mapper/*Mapper.java`
+- `modules/<module>/validation/*` when validation is module-specific
+
+When a module has meaningful sub-features, group files one level deeper inside the normal technical folder. For example:
+
+```text
+modules/match/
+  dto/
+    lobby/
+    setup/
+    state/
+    move/
+  enums/
+    rules/
+    state/
+    lobby/
+  repository/
+    lobby/
+    state/
+    move/
+```
+
+Apply the same pattern to other technical folders when it helps clarity, such as `controller/lobby`, `service/state`, `mapper/move`, or `entity/rules`. Do not create a parallel top-level sub-feature tree outside the module.
 
 Keep cross-cutting code in the existing shared packages:
 
@@ -37,7 +64,7 @@ Keep cross-cutting code in the existing shared packages:
 - `common/web/**`: shared web filters and web infrastructure.
 - `config/**`: Spring configuration only.
 
-Do not create broad top-level packages such as `controllers`, `services`, `models`, `utils`, or `helpers`. Put code with the feature it belongs to, or in `common/**` only when it is truly shared by multiple features.
+Do not create broad top-level packages such as `controllers`, `services`, `models`, `utils`, or `helpers`. Do not create new business packages directly under `com.vencentdev.backend`; put business code in `modules/<module>/**`, or in `common/**` only when it is truly shared by multiple modules.
 
 ## Controllers
 
@@ -58,8 +85,8 @@ For paginated list endpoints, use Spring `Pageable` and return the existing `Pag
 
 Services own business logic, authorization-sensitive checks, and transactions.
 
-- Define a service interface in `<feature>/service/*Service.java`.
-- Implement it in `<feature>/service/*ServiceImpl.java`.
+- Define a service interface in `modules/<module>/service/*Service.java`.
+- Implement it in `modules/<module>/service/*ServiceImpl.java`.
 - Annotate implementations with `@Service`.
 - Use constructor injection with `final` fields.
 - Add `@Transactional` on service methods that read or write managed entities. Use `@Transactional(readOnly = true)` when a method only reads and does not provision or mutate state.
@@ -85,7 +112,7 @@ Do not accept trusted fields from clients when they are derived from authenticat
 
 Entities represent database tables and should stay persistence-focused.
 
-- Put entities in `<feature>/entity/**`.
+- Put entities in `modules/<module>/entity/**`.
 - Use JPA annotations from `jakarta.persistence`.
 - Use `UUID` primary keys with `@GeneratedValue(strategy = GenerationType.UUID)` unless an existing table requires otherwise.
 - Extend `AuditableEntity` for application tables that should track `createdAt`, `updatedAt`, `createdBy`, and `updatedBy`.
@@ -98,6 +125,7 @@ Entities represent database tables and should stay persistence-focused.
   - `@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)`
 - Include only the id in entity equality with `@EqualsAndHashCode.Include`.
 - Use `@Enumerated(EnumType.STRING)` for enums.
+- Put enums in `modules/<module>/enums/**`, not in `entity/**`.
 - Keep column names explicit when they differ from Java field names.
 
 Avoid putting API serialization annotations or business workflow methods on entities unless the existing model makes that necessary.
@@ -106,7 +134,7 @@ Avoid putting API serialization annotations or business workflow methods on enti
 
 Repositories are Spring Data JPA interfaces.
 
-- Put them in `<feature>/repository/**`.
+- Put them in `modules/<module>/repository/**`.
 - Extend `JpaRepository<Entity, UUID>` for UUID-backed entities.
 - Prefer explicit derived query methods that encode ownership, such as `findByIdAndOwnerId`, `findByOwnerId`, and `findByOwnerIdAndStatus`.
 - Keep complex query logic out of controllers. If a query needs business context, call it from a service.
@@ -115,7 +143,7 @@ Repositories are Spring Data JPA interfaces.
 
 Use MapStruct for DTO/entity mapping.
 
-- Put mappers in `<feature>/mapper/**`.
+- Put mappers in `modules/<module>/mapper/**`.
 - Annotate with `@Mapper(componentModel = "spring")`.
 - Use abstract classes when a mapper needs manual helper methods.
 - Ignore server-owned fields when mapping create requests, such as `id`, `ownerId`, audit fields, or fields derived from authentication.
@@ -128,7 +156,7 @@ Do not hand-map in controllers. Small service-level mapping is acceptable only w
 Use Jakarta Bean Validation for request contracts.
 
 - Place simple constraints directly on DTO record components.
-- Put feature-specific annotations and validators in `<feature>/validation/**`.
+- Put module-specific annotations and validators in `modules/<module>/validation/**`.
 - Use cross-field validators when request validity depends on more than one field.
 - Return validation failures through `GlobalExceptionHandler`; do not build ad hoc validation responses in controllers.
 
@@ -161,7 +189,7 @@ Tests should use Spring Security test support, especially `.with(jwt())`, for au
 Use Spring configuration classes only for framework wiring.
 
 - Put framework beans in `config/**`.
-- Put feature runtime properties near the feature when they are feature-specific, as `auth/ratelimit/AuthRateLimitProperties` currently does.
+- Put module runtime properties near the module when they are module-specific, as `modules/auth/ratelimit/AuthRateLimitProperties` currently does.
 - Bind configuration from `application*.yml` using environment-backed defaults.
 - Keep secrets out of source. Use `.env` locally and update `.env.example` when adding required environment variables.
 

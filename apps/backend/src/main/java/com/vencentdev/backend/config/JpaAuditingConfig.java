@@ -1,6 +1,6 @@
 package com.vencentdev.backend.config;
 
-import com.vencentdev.backend.auth.AuthenticatedUser;
+import com.vencentdev.backend.modules.auth.AuthenticatedUser;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
