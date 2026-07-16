@@ -24,17 +24,11 @@ android {
         applicationId = "com.app.app_mobile"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        // flutter_appauth + OIDC requires minSdk 21.
+        // google_sign_in supports Android SDK 21+.
         minSdk = maxOf(flutter.minSdkVersion, 21)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        // OAuth redirect scheme captured by flutter_appauth (AppAuth). For native
-        // Google sign-in this is the reversed client ID. Override at build time:
-        //   flutter build apk -Pandroid.appAuthRedirectScheme=com.googleusercontent.apps.<id>
-        manifestPlaceholders["appAuthRedirectScheme"] =
-            (project.findProperty("android.appAuthRedirectScheme") as String?)
-                ?: "com.googleusercontent.apps.REPLACE_WITH_GOOGLE_CLIENT_ID"
     }
 
     buildTypes {
