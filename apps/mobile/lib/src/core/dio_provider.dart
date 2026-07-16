@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../api/generated/rest_client.dart';
 import '../auth/auth_service.dart';
@@ -17,7 +17,7 @@ final tokenStoreProvider = Provider<TokenStore>(
 );
 
 final authServiceProvider = Provider<AuthService>(
-  (ref) => AuthService(const FlutterAppAuth(), ref.watch(tokenStoreProvider)),
+  (ref) => AuthService(GoogleSignIn.instance, ref.watch(tokenStoreProvider)),
 );
 
 /// Dio configured with the API base URL and an interceptor that attaches the
