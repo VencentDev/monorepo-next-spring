@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/auth_controller.dart';
 import '../../core/env.dart';
+import '../todos/todos_screen.dart';
 
-/// Starter screen: proves the full chain — Keycloak login -> token storage ->
-/// authenticated Dio -> generated client -> rendered backend data.
+/// Starter screen: switches between Google sign-in and the authenticated todo app.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -14,18 +14,12 @@ class HomeScreen extends ConsumerWidget {
     final auth = ref.watch(authControllerProvider);
     final controller = ref.read(authControllerProvider.notifier);
 
+    if (auth case AsyncData(value: final user) when user != null) {
+      return TodosScreen(user: user, onLogout: controller.logout);
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('app_mobile'),
-        actions: [
-          if (auth.asData?.value != null)
-            IconButton(
-              tooltip: 'Log out',
-              icon: const Icon(Icons.logout),
-              onPressed: controller.logout,
-            ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('app_mobile')),
       body: Center(
         child: switch (auth) {
           AsyncLoading() => const CircularProgressIndicator(),
@@ -43,15 +37,6 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
           ),
-          AsyncData(value: final user) when user != null => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.account_circle, size: 72),
-              const SizedBox(height: 12),
-              Text(user.email, style: Theme.of(context).textTheme.titleMedium),
-              Text('Role: ${user.role.name}'),
-            ],
-          ),
           _ => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -64,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
                 const Padding(
                   padding: EdgeInsets.only(top: 12),
                   child: Text(
-                    'Set GOOGLE_CLIENT_ID and GOOGLE_REDIRECT_URL in .env and run with --dart-define-from-file=.env.',
+                    'Set GOOGLE_CLIENT_ID in .env and restart the app.',
                     textAlign: TextAlign.center,
                   ),
                 ),
